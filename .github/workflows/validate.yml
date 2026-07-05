@@ -1,0 +1,40 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate individual plugin files
+        run: |
+          errors=0
+          find plugins -name '*.json' | while read file; do
+            plugin_id=$(basename "$file" .json)
+            echo "Validating $file..."
+
+            node -e "
+              const p = require('./$file');
+              ['id','name','author','description','repo','branch'].forEach(f => {
+                if (!p[f]) throw new Error('Missing ' + f);
+              });
+              console.log('  OK: ' + p.name + ' (' + p.id + ')');
+            " || errors=$((errors + 1))
+          done
+
+          wait
+          if [ $errors -gt 0 ]; then
+            echo "$errors plugin(s) failed validation"
+            exit 1
+          fi
+
+          echo "All plugins validated"
+
+      - name: Generate aggregate plugins.json and verify
+        run: node scripts/generate-plugins-json.js

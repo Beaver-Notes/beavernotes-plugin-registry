@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200;
+}
+
+.hoverable {
+  @apply hover:bg-neutral-800 hover:bg-opacity-5 dark:hover:bg-neutral-200 dark:hover:bg-opacity-5;
+}
+
+.bg-input {
+  @apply bg-black bg-opacity-5 hover:bg-opacity-10 dark:bg-neutral-200 dark:bg-opacity-5 dark:hover:bg-opacity-10 focus:ring-2;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
