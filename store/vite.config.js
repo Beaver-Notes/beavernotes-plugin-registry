@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig(({ command }) => ({
   plugins: [vue()],
-  base: command === 'build' ? '/beaver-notes-plugin-registry/' : '/',
+  base: '/',
   build: {
     outDir: 'dist',
   },
