@@ -1,0 +1,13 @@
+{
+  "id": "com.daniele-rolli.toc",
+  "name": "Table of Contents",
+  "author": "Daniele Rolli",
+  "description": "Generates a table of contents for your notes",
+  "repo": "Daniele-rolli/beavernotes-toc-plugin",
+  "branch": "main",
+  "screenshots": [
+    "https://raw.githubusercontent.com/Daniele-rolli/beavernotes-toc-plugin/main/banner.png"
+  ],
+  "tags": ["productivity", "editor"],
+  "homepage": "https://github.com/Daniele-rolli/beavernotes-toc-plugin"
+}
