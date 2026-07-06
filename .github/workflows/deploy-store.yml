@@ -33,6 +33,9 @@ jobs:
         working-directory: store
         run: npm ci
 
+      - name: Generate plugins.json
+        run: npm run generate
+
       - name: Build
         working-directory: store
         run: npm run build
