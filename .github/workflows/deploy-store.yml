@@ -9,7 +9,7 @@ on:
       - 'plugins.json'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-node@v4
         with:
@@ -35,6 +37,16 @@ jobs:
 
       - name: Generate plugins.json
         run: npm run generate
+
+      - name: Commit generated plugins.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet plugins.json store/public/plugins.json; then
+            git add plugins.json store/public/plugins.json
+            git commit -m "Update plugins.json [skip ci]"
+            git push
+          fi
 
       - name: Build
         working-directory: store
