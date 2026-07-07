@@ -9,13 +9,16 @@ This repo does not accept issues. For plugin-specific problems, open an issue on
 ```
 ├── plugins/                  # Individual plugin files (one .json per plugin)
 │   └── com.example.plugin.json
-├── plugins.json              # Aggregated registry (auto-generated)
+├── plugins.json              # Aggregated registry (auto-generated, enriched by CI)
 ├── plugins-removed.json      # Graveyard for removed plugins
 ├── store/                    # Static store front (Vue/Vite/Tailwind)
 ├── scripts/
-│   └── generate-plugins-json.js
+│   ├── generate-plugins-json.js
+│   ├── resolve-and-mirror.js # Resolve releases, mirror .beax to GHCR, compute SHA-256
+│   └── validate-release.js   # PR-time validation of release assets
 └── .github/workflows/
-    ├── validate.yml          # Validates plugin files on PR
+    ├── validate.yml          # Validates plugin files + release assets on PR
+    ├── mirror-plugins.yml    # Scheduled mirror + SHA-256 pinning to GHCR
     └── deploy-store.yml      # Deploys store to GitHub Pages
 ```
 
@@ -56,6 +59,20 @@ This repo does not accept issues. For plugin-specific problems, open an issue on
 | `screenshots` | No | Array of raw image URLs for previews in the store |
 | `tags` | No | Array of strings for categorization and search |
 | `homepage` | No | URL to the plugin's website or documentation |
+
+## Verification Contract
+
+Every plugin listed in `plugins.json` carries a `sha256` resolved and pinned by CI from the plugin's GitHub Release, plus a `ghcr_ref` mirror on GitHub Container Registry.
+
+Clients **MUST** download the `.beax` (from `ghcr_ref` or `download_url`), compute its SHA-256, and compare it against the `sha256` field in `plugins.json` **before** installing. Reject the install on any mismatch. Do **not** trust a hash fetched from the plugin's own repo at install time — only the value pinned in this registry is authoritative, since that value went through PR review and CI verification.
+
+### Verification logic
+
+```
+sha256(downloaded .beax) === plugins.json[plugin.id].sha256
+```
+
+If the hashes do not match, the client should refuse to install and log an error. This prevents tampered or corrupted plugins from ever being installed, even if the upstream release asset has been replaced.
 
 ## License
 

@@ -6,7 +6,6 @@ on:
     paths:
       - 'store/**'
       - 'plugins/**'
-      - 'plugins.json'
       - '.github/workflows/deploy-store.yml'
 
 permissions:
@@ -36,22 +35,25 @@ jobs:
         working-directory: store
         run: npm ci
 
-      - name: Generate plugins.json
+      - name: Generate store plugins.json
         run: npm run generate
 
-      - name: Commit generated plugins.json
+      - name: Commit generated store data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet plugins.json store/public/plugins.json; then
-            git add plugins.json store/public/plugins.json
-            git commit -m "Update plugins.json [skip ci]"
+          if ! git diff --quiet store/public/plugins.json; then
+            git add store/public/plugins.json
+            git commit -m "Update store plugins.json [skip ci]"
             git push
           fi
 
       - name: Build
         working-directory: store
         run: npm run build
+
+      - name: Copy enriched plugins.json for app and store
+        run: cp plugins.json store/dist/plugins.json
 
       - uses: actions/configure-pages@v4
 

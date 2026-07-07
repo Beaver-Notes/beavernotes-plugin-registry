@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate individual plugin files
         run: |
@@ -36,5 +38,32 @@ jobs:
 
           echo "All plugins validated"
 
-      - name: Generate aggregate plugins.json and verify
+      - name: Generate store plugins.json and verify
         run: node scripts/generate-plugins-json.js
+
+      - name: Validate release assets
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          CHANGED=$(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" -- 'plugins/**/*.json' || true)
+
+          if [ -z "$CHANGED" ]; then
+            echo "No plugin files changed; skipping release validation"
+            exit 0
+          fi
+
+          errors=0
+          for file in $CHANGED; do
+            echo "=== Validating $file ==="
+            node scripts/validate-release.js "$file" || errors=$((errors + 1))
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "$errors plugin(s) failed release validation"
+            exit 1
+          fi
+
+          echo "All release validations passed"

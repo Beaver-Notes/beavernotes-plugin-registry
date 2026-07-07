@@ -6,6 +6,7 @@
   "scripts": {
     "validate": "node -e \"const plugins = require('./plugins.json'); console.log(plugins.length + ' plugins validated')\"",
     "generate": "node scripts/generate-plugins-json.js",
+    "mirror": "node scripts/resolve-and-mirror.js",
     "store:dev": "cd store && npm run dev",
     "store:build": "cd store && npm run build"
   }

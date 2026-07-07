@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 
 const PLUGINS_DIR = path.join(__dirname, '..', 'plugins');
-const OUTPUT_FILE = path.join(__dirname, '..', 'plugins.json');
 const STORE_PUBLIC = path.join(__dirname, '..', 'store', 'public');
 
 function walkDir(dir) {
@@ -21,8 +20,8 @@ function walkDir(dir) {
 
 const files = walkDir(PLUGINS_DIR);
 
-const plugins = [];
 const errors = [];
+const enriched = [];
 
 for (const file of files) {
   const relPath = path.relative(PLUGINS_DIR, file);
@@ -37,14 +36,7 @@ for (const file of files) {
       }
     }
 
-    plugins.push({
-      id: plugin.id,
-      name: plugin.name,
-      author: plugin.author,
-      description: plugin.description,
-      repo: plugin.repo,
-      branch: plugin.branch,
-    });
+    enriched.push(plugin);
   } catch (e) {
     errors.push(`${relPath}: ${e.message}`);
   }
@@ -56,20 +48,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-const aggregate = plugins;
-const enriched = [];
-
-for (const file of files) {
-  try {
-    const content = fs.readFileSync(file, 'utf-8');
-    enriched.push(JSON.parse(content));
-  } catch {}
-}
-
-fs.writeFileSync(OUTPUT_FILE, JSON.stringify(aggregate, null, 2) + '\n');
-
 const storeFile = path.join(STORE_PUBLIC, 'plugins.json');
 fs.writeFileSync(storeFile, JSON.stringify(enriched, null, 2) + '\n');
 
-console.log(`Generated plugins.json with ${aggregate.length} plugin(s)`);
-console.log(`Wrote enriched data to store/public/plugins.json`);
+console.log(`Wrote ${enriched.length} plugin(s) to store/public/plugins.json`);

@@ -1,5 +1,10 @@
 # Plugin Review Checklist
 
+> Some checks below are now **automated by CI** — see
+> [the verification contract](README.md#verification-contract) and
+> `.github/workflows/validate.yml`. Items marked ★ are enforced by CI;
+> reviewers should still verify them but can rely on CI as the primary gate.
+
 Before approving a plugin submission, verify the following:
 
 ## Manifest
@@ -22,7 +27,8 @@ Before approving a plugin submission, verify the following:
 ## Quality
 
 - [ ] Plugin has a README with installation and usage instructions
-- [ ] Plugin has a valid GitHub Release with a `.beax` file attached
+- [★] Plugin has a valid GitHub Release with a `.beax` file attached
+- [★] `manifest.json` id matches the plugin's declared `id`
 - [ ] `manifest.json` version matches the GitHub Release tag
 - [ ] Plugin does not bundle unnecessary files in the `.beax`
 - [ ] No console.log spam (acceptable for debug builds)
